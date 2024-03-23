@@ -1,5 +1,9 @@
 import androidx.compose.foundation.layout.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AddCircle
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.Button
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.*
@@ -51,9 +55,11 @@ fun RegistroPersonas() {
                 }
             },
             modifier = Modifier.align(Alignment.CenterHorizontally)
-        ) {
-            Text("Add")
-        }
+        ) {Icon(
+                imageVector = Icons.Default.AddCircle,
+                contentDescription = null,
+                modifier = Modifier.size(16.dp)
+        )}
 
         Spacer(modifier = Modifier.height(16.dp))
 
