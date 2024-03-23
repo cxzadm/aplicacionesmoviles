@@ -1,6 +1,4 @@
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AddCircle
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
@@ -10,8 +8,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material.icons.filled.Warning
+import androidx.compose.ui.unit.sp
 import java.util.*
 
 class Person(val name: String, val age: Int) {
@@ -37,40 +39,15 @@ fun RegistroPersonas() {
     }
 
     Column(modifier = Modifier.fillMaxSize()) {
-        Box(modifier = Modifier.fillMaxWidth()) {
-            Row(
-                modifier = Modifier
-                    .align(Alignment.CenterStart)
-                    .padding(start = 16.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    text = "Time left: ${timeLeft.toString()}",
-                    fontSize = 20.sp
-                )
+        // Aquí se muestra el temporizador antes del formulario
+        FormTimer(
+            duration = timeLeft,
+            onPause = { isPaused = true },
+            onReset = {
+                isPaused = false
+                timeLeft = 10
             }
-            Row(
-                modifier = Modifier
-                    .align(Alignment.CenterEnd)
-                    .padding(end = 16.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Button(
-                    onClick = { isPaused = true }
-                ) {
-                    Text("Pausar")
-                }
-                Spacer(modifier = Modifier.width(8.dp))
-                Button(
-                    onClick = {
-                        timeLeft = 10
-                        isPaused = false
-                    }
-                ) {
-                    Text("Reiniciar")
-                }
-            }
-        }
+        )
 
         Spacer(modifier = Modifier.height(16.dp))
 
@@ -78,7 +55,8 @@ fun RegistroPersonas() {
             value = nombre,
             onValueChange = { nombre = it },
             label = { Text("Nombre") },
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
+            enabled = timeLeft > 0 // Deshabilitar el TextField cuando el tiempo llegue a 0
         )
 
         Spacer(modifier = Modifier.height(15.dp))
@@ -87,7 +65,8 @@ fun RegistroPersonas() {
             value = edad,
             onValueChange = { edad = it },
             label = { Text("Edad") },
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
+            enabled = timeLeft > 0 // Deshabilitar el TextField cuando el tiempo llegue a 0
         )
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -104,12 +83,13 @@ fun RegistroPersonas() {
                     }
                 }
             },
-            modifier = Modifier.align(Alignment.CenterHorizontally)
+            modifier = Modifier.align(Alignment.CenterHorizontally),
+            enabled = timeLeft > 0 // Deshabilitar el botón cuando el tiempo llegue a 0
         ) {
             Icon(
-                imageVector = Icons.Default.AddCircle,
+                imageVector = Icons.Default.Add,
                 contentDescription = null,
-                modifier = Modifier.size(16.dp)
+                modifier = Modifier.size(20.dp)
             )
         }
 
@@ -117,6 +97,57 @@ fun RegistroPersonas() {
 
         personas.forEach { person ->
             Text(text = "ID: ${person.id}, Nombre: ${person.name}, Edad: ${person.age}")
+        }
+    }
+}
+
+@Composable
+fun FormTimer(
+    duration: Int,
+    onPause: () -> Unit = {},
+    onReset: () -> Unit = {},
+    onComplete: () -> Unit = {}
+) {
+    var timeLeft by remember { mutableStateOf(duration) }
+    var isPaused by remember { mutableStateOf(false) }
+
+    LaunchedEffect(key1 = timeLeft) {
+        while (timeLeft > 0 && !isPaused) {
+            delay(1000L)
+            timeLeft--
+        }
+        onComplete()
+    }
+
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Text(
+            text = "Time left: ${timeLeft.toString()}",
+            modifier = Modifier.padding(16.dp),
+            fontSize = 20.sp
+        )
+        Spacer(modifier = Modifier.weight(1f))
+        Button(
+            onClick = { onPause() },
+            modifier = Modifier.padding(16.dp)
+        ) {
+            Icon(
+                imageVector = Icons.Default.Warning,
+                contentDescription = null,
+                modifier = Modifier.size(20.dp)
+            )
+        }
+        Button(
+            onClick = { onReset() },
+            modifier = Modifier.padding(16.dp)
+        ) {
+            Icon(
+                imageVector = Icons.Default.Refresh,
+                contentDescription = null,
+                modifier = Modifier.size(20.dp)
+            )
         }
     }
 }

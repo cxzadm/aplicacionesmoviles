@@ -21,6 +21,7 @@ fun NameList() {
     Column(
         modifier = Modifier.fillMaxSize()
     ) {
+        FormTimer(10)
         Row(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
